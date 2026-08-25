@@ -11,7 +11,7 @@ export function AdminOrderStatusUpdater({
 }: { 
   orderId: string;
   currentStatus: string;
-  trackingHistory: any[];
+  trackingHistory: { id: string; status: string; createdAt: Date; description?: string | null; courier?: string | null; trackingNumber?: string | null; location?: string | null }[];
 }) {
   const router = useRouter();
   const [status, setStatus] = useState(currentStatus);

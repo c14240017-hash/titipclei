@@ -44,7 +44,7 @@ export async function PATCH(request: Request, context: { params: Promise<{ id: s
         ...prepared.data,
         images: { deleteMany: {}, create: (prepared.input.imageUrls || (prepared.input.imageUrl ? [prepared.input.imageUrl] : [])).map((imageUrl: string, idx: number) => ({ imageUrl, sortOrder: idx, isPrimary: idx === 0 })) },
         variants: {
-          create: prepared.input.variants?.map((v: any) => ({
+          create: prepared.input.variants?.map((v) => ({
             name: v.name,
             colorName: v.colorName,
             colorHex: v.colorHex,

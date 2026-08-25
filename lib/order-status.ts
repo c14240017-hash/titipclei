@@ -1,3 +1,4 @@
+import type { LucideIcon } from "lucide-react";
 import {
   Clock,
   Clock3,
@@ -43,7 +44,7 @@ export const orderStatusMap: Record<string, {
   description: string;
   nextStep?: string;
   color: { bg: string; text: string };
-  icon: any;
+  icon: LucideIcon;
   stepIndex: number;
 }> = {
   WAITING_PAYMENT: {

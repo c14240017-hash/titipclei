@@ -48,7 +48,7 @@ export function ProductVariantManager({
     onChange(variants.filter((v) => v.id !== id));
   };
 
-  const updateVariant = (id: string, field: keyof VariantData, value: any) => {
+  const updateVariant = (id: string, field: keyof VariantData, value: VariantData[keyof VariantData]) => {
     onChange(variants.map((v) => (v.id === id ? { ...v, [field]: value } : v)));
   };
 
