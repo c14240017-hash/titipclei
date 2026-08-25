@@ -1,0 +1,372 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum Role {
+  CUSTOMER
+  ADMIN
+}
+
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String?   @unique
+  passwordHash  String?
+  phone         String?
+  role          Role      @default(CUSTOMER)
+  image         String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  jastipRequests JastipRequest[]
+  quotations     Quotation[]
+  orders         Order[]
+}
+
+enum ProductStatus {
+  OPEN
+  CLOSING_SOON
+  CLOSED
+}
+
+enum PriceRoundingType {
+  NONE
+  ROUND_1000
+  ROUND_5000
+  ROUND_10000
+}
+
+model Product {
+  id                String        @id @default(cuid())
+  name              String
+  slug              String        @unique
+  description       String?       @db.Text
+  brand             String?
+  categoryId        String?
+  countryCode       String
+  currencyCode      String
+  originalPrice     Decimal       @db.Decimal(18, 2)
+  estimatedPriceIdr Float?
+  sellingPrice      Decimal       @default(0) @db.Decimal(18, 0)
+  exchangeRate      Decimal       @default(0) @db.Decimal(18, 4)
+  exchangeRateSource String       @default("BANK_INDONESIA")
+  exchangeRateDate  DateTime?
+  useManualRate     Boolean       @default(false)
+  chinaShipping     Decimal       @default(0) @db.Decimal(18, 0)
+  internationalShipping Decimal   @default(0) @db.Decimal(18, 0)
+  tax               Decimal       @default(0) @db.Decimal(18, 0)
+  additionalCost    Decimal       @default(0) @db.Decimal(18, 0)
+  totalCost         Decimal       @default(0) @db.Decimal(18, 0)
+  marginType        MarginType    @default(PERCENTAGE)
+  marginPercentage  Decimal?      @db.Decimal(8, 2)
+  marginFixed       Decimal?      @db.Decimal(18, 0)
+  profit            Decimal       @default(0) @db.Decimal(18, 0)
+  calculatedSellingPrice Decimal  @default(0) @db.Decimal(18, 0)
+  roundingType      PriceRoundingType @default(NONE)
+  stock             Int           @default(0)
+  featured          Boolean       @default(false)
+  popularity        Int           @default(0)
+  imageUrl          String?
+  status            ProductStatus @default(OPEN)
+  deadline          DateTime?
+  weight            Float?
+  createdAt         DateTime      @default(now())
+  updatedAt         DateTime      @updatedAt
+
+  category Category? @relation(fields: [categoryId], references: [id])
+  catalogOrders Order[]
+  variants      ProductVariant[]
+  images        ProductImage[]
+}
+
+model ProductImage {
+  id        String   @id @default(cuid())
+  productId String
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  imageUrl  String
+  sortOrder Int      @default(0)
+  isPrimary Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  @@index([productId, sortOrder])
+}
+
+enum ProductVariantStatus {
+  ACTIVE
+  INACTIVE
+}
+
+model ProductVariant {
+  id                String   @id @default(cuid())
+  productId         String
+  product           Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  name              String?
+  colorName         String?
+  colorHex          String?
+  size              String?
+  model             String?
+
+  sku               String?
+  stock             Int      @default(0)
+  status            ProductVariantStatus @default(ACTIVE)
+
+  priceAdjustment   Decimal? @default(0) @db.Decimal(18, 0)
+
+  isDefault         Boolean  @default(false)
+  sortOrder         Int      @default(0)
+
+  images            ProductVariantImage[]
+
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+}
+
+model ProductVariantImage {
+  id          String         @id @default(cuid())
+  variantId   String
+  variant     ProductVariant @relation(fields: [variantId], references: [id], onDelete: Cascade)
+
+  imageUrl    String
+  sortOrder   Int            @default(0)
+  isPrimary   Boolean        @default(false)
+
+  createdAt   DateTime       @default(now())
+}
+
+model Category {
+  id       String    @id @default(cuid())
+  name     String
+  slug     String    @unique
+  products Product[]
+}
+
+enum RequestStatus {
+  PENDING_REVIEW
+  REVIEWED
+  QUOTATION_SENT
+  ACCEPTED
+  QUOTATION_REJECTED
+  CANCELLED
+}
+
+model JastipRequest {
+  id            String        @id @default(cuid())
+  userId        String?
+  requestNumber String        @unique @default(cuid())
+  productUrl    String?       @db.Text
+  productName   String
+  countryCode   String
+  currencyCode  String
+  originalPrice Float?
+  quantity      Int           @default(1)
+  variant       String?
+  imageUrl      String?
+  notes         String?       @db.Text
+  status        RequestStatus @default(PENDING_REVIEW)
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+
+  user       User?       @relation(fields: [userId], references: [id])
+  quotations Quotation[]
+}
+
+model ExchangeRate {
+  id               String   @id @default(cuid())
+  baseCurrency     String   @default("IDR")
+  targetCurrency   String   @unique
+  marketRate       Decimal  @db.Decimal(18, 4)
+  spreadPercent    Float    @default(5.0)
+  appliedRate      Decimal  @db.Decimal(18, 4)
+  buyRate          Decimal? @db.Decimal(18, 4)
+  sourceDate       DateTime?
+  provider         String?
+  fetchedAt        DateTime @default(now())
+  isManualOverride Boolean  @default(false)
+  manualRate       Decimal? @db.Decimal(18, 4)
+  updatedAt        DateTime @updatedAt
+}
+
+enum QuotationStatus {
+  DRAFT
+  PENDING
+  SENT
+  ACCEPTED
+  REJECTED
+  EXPIRED
+}
+
+enum MarginType {
+  PERCENTAGE
+  FIXED
+  PERCENTAGE_PLUS_FIXED
+}
+
+model Quotation {
+  id                    String          @id @default(cuid())
+  quotationNumber       String          @unique
+  publicToken           String          @unique @default(cuid())
+  userId                String?
+  jastipRequestId       String?
+  status                QuotationStatus @default(DRAFT)
+  
+  originalCurrency      String
+  originalPrice         Float
+  quantity              Int
+  
+  marketExchangeRate    Float
+  appliedExchangeRate   Float
+  exchangeRateProvider  String?
+  exchangeRateTimestamp DateTime?
+  
+  convertedProductCost  Float
+  internationalShipping Float           @default(0)
+  estimatedTax          Float           @default(0)
+  additionalCost        Float           @default(0)
+  
+  serviceMarginType     MarginType      @default(PERCENTAGE)
+  serviceMarginValue    Float           @default(10)
+  serviceFee            Float
+  
+  totalCost             Float
+  profit                Float
+  finalPrice            Float
+  
+  expiresAt             DateTime?
+  acceptedAt            DateTime?
+  rejectedAt            DateTime?
+  createdAt             DateTime        @default(now())
+  updatedAt             DateTime        @updatedAt
+
+  user          User?          @relation(fields: [userId], references: [id])
+  jastipRequest JastipRequest? @relation(fields: [jastipRequestId], references: [id])
+  orders        Order[]
+}
+
+enum OrderStatus {
+  WAITING_PAYMENT
+  WAITING_VERIFICATION
+  PAID
+  PURCHASING
+  PURCHASED
+  CHECKING_ITEM
+  INTERNATIONAL_SHIPPING
+  ARRIVED_INDONESIA
+  DOMESTIC_SHIPPING
+  COMPLETED
+  CANCELLED
+}
+
+enum PaymentStatus {
+  PENDING
+  PAID
+  FAILED
+  EXPIRED
+  REFUNDED
+  WAITING_PAYMENT
+  WAITING_VERIFICATION
+  VERIFIED
+  REJECTED
+}
+
+enum PaymentMethod {
+  BANK_TRANSFER
+}
+
+model Order {
+  id               String        @id @default(cuid())
+  orderNumber      String        @unique
+  publicToken      String        @unique @default(cuid())
+  userId           String?
+  quotationId      String?
+  requestId        String?
+  productId        String?
+  productNameSnapshot String?
+  
+  variantId             String?
+  variantNameSnapshot   String?
+  selectedColor         String?
+  selectedSize          String?
+  selectedModel         String?
+  selectedImageSnapshot String?
+  unitPriceSnapshot     Decimal?       @db.Decimal(18, 0)
+  
+  unitPrice        Decimal?       @db.Decimal(18, 0)
+  quantity         Int            @default(1)
+  variant          String?
+  customerName     String?
+  customerPhone    String?
+  customerEmail    String?
+  termsAcceptedAt  DateTime?
+  subtotal         Float
+  shippingDomestic Float         @default(0)
+  total            Float
+  paymentStatus    PaymentStatus @default(WAITING_PAYMENT)
+  orderStatus      OrderStatus   @default(WAITING_PAYMENT)
+  createdAt        DateTime      @default(now())
+  updatedAt        DateTime      @updatedAt
+
+  user          User?           @relation(fields: [userId], references: [id])
+  quotation     Quotation?      @relation(fields: [quotationId], references: [id])
+  product       Product?        @relation(fields: [productId], references: [id])
+  orderTracking OrderTracking[]
+  payment       Payment?
+
+  @@unique([quotationId])
+}
+
+model Payment {
+  id                 String        @id @default(cuid())
+  orderId            String        @unique
+  amount             Float
+  method             PaymentMethod @default(BANK_TRANSFER)
+  bankName           String
+  destinationAccount String
+  accountHolder      String
+  proofImageUrl      String?       @db.Text
+  proofStorageKey    String?
+  senderName         String?
+  notes              String?       @db.Text
+  status             PaymentStatus @default(WAITING_PAYMENT)
+  submittedAt        DateTime?
+  verifiedAt         DateTime?
+  rejectedAt         DateTime?
+  rejectionReason    String?       @db.Text
+  createdAt          DateTime      @default(now())
+  updatedAt          DateTime      @updatedAt
+
+  order Order @relation(fields: [orderId], references: [id])
+}
+
+model OrderTracking {
+  id             String      @id @default(cuid())
+  orderId        String
+  status         OrderStatus
+  description    String?     @db.Text
+  trackingNumber String?
+  courier        String?
+  location       String?
+  createdAt      DateTime    @default(now())
+
+  order Order @relation(fields: [orderId], references: [id])
+}
+
+model MarginRule {
+  id           String     @id @default(cuid())
+  name         String
+  ruleType     MarginType
+  categoryId   String?
+  countryCode  String?
+  minPrice     Float?
+  maxPrice     Float?
+  percentage   Float?
+  fixedAmount  Float?
+  priority     Int        @default(0)
+  isActive     Boolean    @default(true)
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+}

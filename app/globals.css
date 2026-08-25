@@ -1,0 +1,165 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-sans);
+  --font-mono: var(--font-geist-mono);
+  --font-heading: var(--font-sans);
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar: var(--sidebar);
+  --color-chart-5: var(--chart-5);
+  --color-chart-4: var(--chart-4);
+  --color-chart-3: var(--chart-3);
+  --color-chart-2: var(--chart-2);
+  --color-chart-1: var(--chart-1);
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+  --radius-2xl: calc(var(--radius) * 1.8);
+  --radius-3xl: calc(var(--radius) * 2.2);
+  --radius-4xl: calc(var(--radius) * 2.6);
+}
+
+:root {
+  --background: oklch(0.985 0.003 264);
+  --foreground: oklch(0.22 0.03 264);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.145 0 0);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.145 0 0);
+  --primary: #D98C97;
+  --primary-foreground: oklch(0.985 0 0);
+  --secondary: oklch(0.96 0.018 275);
+  --secondary-foreground: oklch(0.205 0 0);
+  --muted: oklch(0.965 0.008 264);
+  --muted-foreground: oklch(0.54 0.025 264);
+  --accent: oklch(0.95 0.025 275);
+  --accent-foreground: oklch(0.205 0 0);
+  --destructive: oklch(0.577 0.245 27.325);
+  --border: oklch(0.91 0.012 264);
+  --input: oklch(0.9 0.015 264);
+  --ring: #D98C97;
+  --chart-1: oklch(0.87 0 0);
+  --chart-2: oklch(0.556 0 0);
+  --chart-3: oklch(0.439 0 0);
+  --chart-4: oklch(0.371 0 0);
+  --chart-5: oklch(0.269 0 0);
+  --radius: 0.625rem;
+  --sidebar: oklch(0.985 0 0);
+  --sidebar-foreground: oklch(0.145 0 0);
+  --sidebar-primary: oklch(0.205 0 0);
+  --sidebar-primary-foreground: oklch(0.985 0 0);
+  --sidebar-accent: oklch(0.97 0 0);
+  --sidebar-accent-foreground: oklch(0.205 0 0);
+  --sidebar-border: oklch(0.922 0 0);
+  --sidebar-ring: oklch(0.708 0 0);
+}
+
+.dark {
+  --background: oklch(0.145 0 0);
+  --foreground: oklch(0.985 0 0);
+  --card: oklch(0.205 0 0);
+  --card-foreground: oklch(0.985 0 0);
+  --popover: oklch(0.205 0 0);
+  --popover-foreground: oklch(0.985 0 0);
+  --primary: oklch(0.922 0 0);
+  --primary-foreground: oklch(0.205 0 0);
+  --secondary: oklch(0.269 0 0);
+  --secondary-foreground: oklch(0.985 0 0);
+  --muted: oklch(0.269 0 0);
+  --muted-foreground: oklch(0.708 0 0);
+  --accent: oklch(0.269 0 0);
+  --accent-foreground: oklch(0.985 0 0);
+  --destructive: oklch(0.704 0.191 22.216);
+  --border: oklch(1 0 0 / 10%);
+  --input: oklch(1 0 0 / 15%);
+  --ring: oklch(0.556 0 0);
+  --chart-1: oklch(0.87 0 0);
+  --chart-2: oklch(0.556 0 0);
+  --chart-3: oklch(0.439 0 0);
+  --chart-4: oklch(0.371 0 0);
+  --chart-5: oklch(0.269 0 0);
+  --sidebar: oklch(0.205 0 0);
+  --sidebar-foreground: oklch(0.985 0 0);
+  --sidebar-primary: oklch(0.488 0.243 264.376);
+  --sidebar-primary-foreground: oklch(0.985 0 0);
+  --sidebar-accent: oklch(0.269 0 0);
+  --sidebar-accent-foreground: oklch(0.985 0 0);
+  --sidebar-border: oklch(1 0 0 / 10%);
+  --sidebar-ring: oklch(0.556 0 0);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+    background-image: radial-gradient(circle at top, rgb(245 215 221 / 0.7), transparent 32rem);
+  }
+  html {
+    @apply font-sans;
+    scroll-behavior: smooth;
+  }
+}
+
+::selection {
+  background: #F5D7DD;
+  color: #6F4A45;
+}
+
+@layer components {
+  .field { @apply w-full rounded-xl border border-[#E8DAD3] bg-[#FFFDFC] px-3 py-3 text-sm font-normal text-[#3F2E2A] outline-none placeholder:text-[#8A6F68] focus:border-[#D98C97] focus:ring-2 focus:ring-[#F5D7DD]; }
+}
+
+@media (min-width: 1024px) {
+  form[class*="lg:grid-cols"] > aside.lg\:sticky {
+    top: 6rem;
+    z-index: 20;
+  }
+}
+
+/* Titip Clei admin surface: warm overlays keep existing data views cohesive while pages migrate. */
+[class*="bg-indigo-"], [class*="bg-violet-"] { background-color: #F8E8EB !important; }
+[class*="text-indigo-"], [class*="text-violet-"] { color: #C66C7C !important; }
+[class*="border-indigo-"], [class*="border-violet-"] { border-color: #EADBD4 !important; }
+[class*="bg-blue-"], [class*="bg-purple-"] { background-color: #F6E4E8 !important; }
+[class*="text-blue-"], [class*="text-purple-"] { color: #C86D7D !important; }
+[class*="border-blue-"], [class*="border-purple-"] { border-color: #E8D8D1 !important; }
+[class*="ring-indigo-"], [class*="ring-violet-"], [class*="ring-blue-"], [class*="focus:ring-indigo"], [class*="focus:ring-violet"], [class*="focus:ring-blue"] { --tw-ring-color: #D98392 !important; }
+.bg-indigo-600, .bg-\[\#5B3DF5\] { background-color: #D98591 !important; }
+.hover\:bg-indigo-700:hover, .hover\:bg-\[\#4930D8\]:hover { background-color: #C66C7C !important; }
+.text-\[\#0F1B38\], .text-slate-950, .text-slate-900 { color: #3B2925 !important; }
+.bg-\[\#F7F8FC\], .bg-slate-50 { background-color: #FFF9F5 !important; }
+.border-\[\#E6E8F0\], .border-slate-200 { border-color: #EADBD4 !important; }
+.text-\[\#5B3DF5\] { color: #C86D7D !important; }
+.bg-\[\#F1EEFF\] { background-color: #F6E4E8 !important; }
+a { color: inherit; }

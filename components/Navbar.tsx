@@ -1,0 +1,10 @@
+"use client";
+import Image from "next/image";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { Menu, ShoppingBag, X } from "lucide-react";
+import { useState } from "react";
+import { brand } from "@/lib/brand";
+
+const links = [{ name: "Beranda", href: "/" }, { name: "Semua Produk", href: "/products" }, { name: "Cara Kerja", href: "/#cara-kerja" }, { name: "Request Barang", href: "/request" }];
+export function Navbar() { const pathname = usePathname(); const [open, setOpen] = useState(false); const linkClass = (active: boolean) => `rounded-full px-3 py-2 text-sm font-semibold transition ${active ? "bg-[#F5D7DD] text-[#6F4A45]" : "text-[#6F4A45] hover:bg-[#F7EFE8]"}`; return <header className="sticky top-0 z-50 border-b border-[#E8DAD3] bg-[#FFFDFC]/95 backdrop-blur"><div className="mx-auto flex h-[76px] max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8"><Link href="/" aria-label={`${brand.name} beranda`} className="relative block h-12 w-44 shrink-0 sm:w-52"><Image src={brand.logo} alt="Titip Clei" fill sizes="208px" className="object-contain object-left" priority /></Link><nav className="hidden items-center gap-1 lg:flex">{links.map((link) => <Link key={link.name} href={link.href} className={linkClass(pathname === link.href)}>{link.name}</Link>)}</nav><Link href="/track" className="hidden items-center gap-2 rounded-full bg-[#D98C97] px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-[#6F4A45] lg:flex"><ShoppingBag className="h-4 w-4" />Cek Pesanan</Link><button onClick={() => setOpen(!open)} className="rounded-xl p-2 text-[#6F4A45] hover:bg-[#F7EFE8] lg:hidden" aria-label="Buka menu">{open ? <X /> : <Menu />}</button></div>{open && <nav className="border-t border-[#E8DAD3] bg-[#FFFDFC] p-4 lg:hidden">{[...links, { name: "Cek Pesanan", href: "/track" }].map((link) => <Link key={link.name} href={link.href} onClick={() => setOpen(false)} className="block rounded-xl px-4 py-3 font-semibold text-[#6F4A45] hover:bg-[#F7EFE8]">{link.name}</Link>)}</nav>}</header>; }
