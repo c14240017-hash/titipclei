@@ -33,6 +33,7 @@ export function AdminRequestDeleteButton({ id, requestNumber, customerName, prod
       return;
     }
     setOpen(false);
+    window.dispatchEvent(new Event("admin:requests-changed"));
     if (detail) {
       router.push("/admin/requests?deleted=1");
       router.refresh();
