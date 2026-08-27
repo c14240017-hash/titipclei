@@ -3,7 +3,7 @@ import { Download, Package, ReceiptText, ShoppingCart, Wallet } from "lucide-rea
 import { prisma } from "@/lib/prisma";
 import { requireAdminPage } from "@/lib/require-admin";
 
-const rupiah = (value: number) => `Rp${value.toLocaleString("id-ID")}`;
+const rupiah = (value: number) => `Rp${(Number.isFinite(value) ? Math.round(value) : 0).toLocaleString("id-ID")}`;
 
 async function dashboardQuery<T>(operation: string, query: () => Promise<T>) {
   try {
@@ -24,16 +24,21 @@ async function dashboardQuery<T>(operation: string, query: () => Promise<T>) {
 
 export default async function AdminDashboard() {
   await requireAdminPage();
-  const [products, newRequests, pendingPayments, activeOrders, acceptedQuotations, revenue, profit, requests] = await Promise.all([
+  const [products, newRequests, pendingPayments, activeOrders, acceptedQuotations, revenue, paidOrders, requests] = await Promise.all([
     dashboardQuery("product-count", () => prisma.product.count()),
     dashboardQuery("pending-request-count", () => prisma.jastipRequest.count({ where: { status: "PENDING_REVIEW" } })),
     dashboardQuery("pending-payment-count", () => prisma.payment.count({ where: { status: "WAITING_VERIFICATION" } })),
     dashboardQuery("active-order-count", () => prisma.order.count({ where: { orderStatus: { notIn: ["COMPLETED", "CANCELLED"] } } })),
     dashboardQuery("accepted-quotation-count", () => prisma.quotation.count({ where: { status: "ACCEPTED" } })),
-    dashboardQuery("revenue-sum", () => prisma.order.aggregate({ _sum: { total: true }, where: { paymentStatus: { in: ["PAID", "VERIFIED"] } } })),
-    dashboardQuery("profit-sum", () => prisma.quotation.aggregate({ _sum: { profit: true }, where: { status: "ACCEPTED" } })),
+    dashboardQuery("revenue-sum", () => prisma.order.aggregate({ _sum: { total: true }, where: { paymentStatus: { in: ["PAID", "VERIFIED"] }, payment: { is: { status: { in: ["PAID", "VERIFIED"] } } } } })),
+    dashboardQuery("paid-order-profit-snapshots", () => prisma.order.findMany({ where: { paymentStatus: { in: ["PAID", "VERIFIED"] }, payment: { is: { status: { in: ["PAID", "VERIFIED"] } } }, quotation: { isNot: null } }, select: { quotation: { select: { profit: true } } } })),
     dashboardQuery("latest-requests", () => prisma.jastipRequest.findMany({ take: 5, orderBy: { createdAt: "desc" }, include: { user: true } })),
   ]);
-  const cards = [["Total Produk", String(products), Package], ["Request Baru", String(newRequests), ReceiptText], ["Penawaran Diterima", String(acceptedQuotations), ReceiptText], ["Pembayaran Pending", String(pendingPayments), Wallet], ["Pesanan Aktif", String(activeOrders), ShoppingCart], ["Omzet", rupiah(revenue._sum.total ?? 0), Wallet], ["Profit", rupiah(profit._sum.profit ?? 0), Wallet]] as const;
+  const omzet = Number(revenue._sum.total);
+  const profit = paidOrders.reduce((total, order) => {
+    const value = Number(order.quotation?.profit);
+    return Number.isFinite(value) ? total + value : total;
+  }, 0);
+  const cards = [["Total Produk", String(products), Package], ["Request Baru", String(newRequests), ReceiptText], ["Penawaran Diterima", String(acceptedQuotations), ReceiptText], ["Pembayaran Pending", String(pendingPayments), Wallet], ["Pesanan Aktif", String(activeOrders), ShoppingCart], ["Omzet", rupiah(omzet), Wallet], ["Profit", rupiah(profit), Wallet]] as const;
   return <div className="mx-auto max-w-7xl space-y-7"><div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-end"><div><p className="text-sm font-semibold text-indigo-600">Dashboard admin</p><h1 className="mt-1 text-3xl font-bold text-slate-950">Ringkasan JastipHub</h1><p className="mt-2 text-sm text-slate-500">Data bisnis aktual dari database.</p></div><a href="/api/admin/reports/export" className="inline-flex items-center justify-center gap-2 rounded-xl bg-[#D98392] px-5 py-3 text-sm font-semibold text-white shadow-sm shadow-[#D98392]/25 transition-colors hover:bg-[#C86D7D] active:bg-[#B95F70] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#EAB5C0] focus-visible:ring-offset-2"><Download className="h-4 w-4 text-white" />Unduh Laporan CSV</a></div><div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">{cards.map(([title, value, Icon]) => <article key={title} className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm"><div className="flex items-center justify-between"><p className="text-sm text-slate-500">{title}</p><Icon className="h-5 w-5 text-indigo-600" /></div><p className="mt-4 text-2xl font-bold text-slate-950">{value}</p></article>)}</div><section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm"><div className="flex items-center justify-between"><div><h2 className="font-bold text-slate-950">Request terbaru</h2><p className="mt-1 text-sm text-slate-500">Request yang benar-benar masuk dari pelanggan.</p></div><Link href="/admin/requests" className="text-sm font-semibold text-indigo-600">Lihat semua</Link></div>{requests.length ? <div className="mt-5 divide-y divide-slate-100">{requests.map((request) => <Link key={request.id} href={`/admin/requests/${request.id}`} className="flex items-center justify-between gap-4 py-4 hover:bg-slate-50"><div><p className="font-semibold">{request.productName}</p><p className="text-sm text-slate-500">{request.user?.name || "Pelanggan"} · {request.requestNumber}</p></div><span className="rounded-full bg-amber-50 px-2.5 py-1 text-xs font-semibold text-amber-700">{request.status === "PENDING_REVIEW" ? "Baru" : request.status}</span></Link>)}</div> : <p className="py-12 text-center text-sm text-slate-500">Belum ada request barang.</p>}</section><section className="grid gap-3 sm:grid-cols-3"><Link href="/admin/products/new" className="rounded-xl border border-slate-200 bg-white p-4 text-sm font-semibold hover:border-indigo-200 hover:text-indigo-600">Tambah Produk</Link><Link href="/admin/requests?status=PENDING_REVIEW" className="rounded-xl border border-slate-200 bg-white p-4 text-sm font-semibold hover:border-indigo-200 hover:text-indigo-600">Review Request</Link><Link href="/admin/payments?status=WAITING_VERIFICATION" className="rounded-xl border border-slate-200 bg-white p-4 text-sm font-semibold hover:border-indigo-200 hover:text-indigo-600">Verifikasi Pembayaran</Link></section></div>;
 }
