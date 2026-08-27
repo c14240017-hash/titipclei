@@ -13,7 +13,15 @@ function getDatabaseUrl() {
   return value;
 }
 
-const pool = globalForPrisma.prismaPool ?? new Pool({ connectionString: getDatabaseUrl() });
+const pool = globalForPrisma.prismaPool ?? new Pool({
+  connectionString: getDatabaseUrl(),
+  // Vercel can create many concurrent runtime instances. Keep each instance to one
+  // short-lived database connection; Supabase's transaction pooler handles sharing.
+  max: 1,
+  idleTimeoutMillis: 10_000,
+  connectionTimeoutMillis: 5_000,
+  allowExitOnIdle: true,
+});
 const adapter = new PrismaPg(pool);
 
 export const prisma = globalForPrisma.prisma ?? new PrismaClient({ adapter });
