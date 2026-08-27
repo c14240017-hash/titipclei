@@ -6,8 +6,9 @@ export const runtime = "nodejs";
 
 export async function POST(request: NextRequest, context: { params: Promise<{ orderId: string }> }) {
   const { orderId } = await context.params;
-  const order = await prisma.order.findUnique({ where: { publicToken: orderId }, select: { id: true, total: true, publicToken: true } });
+  const order = await prisma.order.findUnique({ where: { publicToken: orderId }, select: { id: true, total: true, publicToken: true, recipientName: true, recipientPhone: true, addressLine: true, city: true, province: true, postalCode: true } });
   if (!order) return NextResponse.json({ error: "Pesanan tidak ditemukan." }, { status: 404 });
+  if (!order.recipientName || !order.recipientPhone || !order.addressLine || !order.city || !order.province || !order.postalCode) return NextResponse.json({ error: "Lengkapi alamat pengiriman sebelum mengunggah bukti pembayaran." }, { status: 400 });
 
   const formData = await request.formData();
   const proof = formData.get("proof");

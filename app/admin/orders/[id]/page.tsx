@@ -74,6 +74,18 @@ export default async function AdminOrderDetailPage({ params }: { params: Promise
           </div>
         </section>
 
+        <section className="rounded-2xl border border-[#E8D8D1] bg-[#FFFDFC] p-6 shadow-sm">
+          <h2 className="mb-4 text-lg font-bold text-[#4B342F]">Alamat Pengiriman</h2>
+          {order.addressLine ? (
+            <dl className="space-y-3 text-sm text-[#4B342F]">
+              <div><dt className="text-[#8A6F67]">Penerima</dt><dd className="font-semibold">{order.recipientName || order.customerName}</dd></div>
+              <div><dt className="text-[#8A6F67]">WhatsApp</dt><dd className="font-semibold">{order.recipientPhone || order.customerPhone}</dd></div>
+              <div><dt className="text-[#8A6F67]">Alamat</dt><dd className="font-semibold leading-6">{order.addressLine}<br />{order.city}, {order.province} {order.postalCode}</dd></div>
+              {order.shippingNote && <div><dt className="text-[#8A6F67]">Catatan</dt><dd>{order.shippingNote}</dd></div>}
+            </dl>
+          ) : <p className="text-sm text-[#8A6F67]">Alamat pengiriman belum dilengkapi customer.</p>}
+        </section>
+
         <section className="lg:col-span-2 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
           <h2 className="font-bold text-lg mb-4">Update Status & Pengiriman</h2>
           <AdminOrderStatusUpdater 

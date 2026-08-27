@@ -30,13 +30,13 @@ export default async function AdminDashboard() {
     dashboardQuery("pending-payment-count", () => prisma.payment.count({ where: { status: "WAITING_VERIFICATION" } })),
     dashboardQuery("active-order-count", () => prisma.order.count({ where: { orderStatus: { notIn: ["COMPLETED", "CANCELLED"] } } })),
     dashboardQuery("accepted-quotation-count", () => prisma.quotation.count({ where: { status: "ACCEPTED" } })),
-    dashboardQuery("revenue-sum", () => prisma.order.aggregate({ _sum: { total: true }, where: { paymentStatus: { in: ["PAID", "VERIFIED"] }, payment: { is: { status: { in: ["PAID", "VERIFIED"] } } } } })),
-    dashboardQuery("paid-order-profit-snapshots", () => prisma.order.findMany({ where: { paymentStatus: { in: ["PAID", "VERIFIED"] }, payment: { is: { status: { in: ["PAID", "VERIFIED"] } } }, quotation: { isNot: null } }, select: { quotation: { select: { profit: true } } } })),
+    dashboardQuery("revenue-sum", () => prisma.order.aggregate({ _sum: { total: true }, where: { paymentStatus: { in: ["PAID", "VERIFIED"] }, orderStatus: { not: "CANCELLED" }, payment: { is: { status: { in: ["PAID", "VERIFIED"] } } } } })),
+    dashboardQuery("paid-order-profit-snapshots", () => prisma.order.findMany({ where: { paymentStatus: { in: ["PAID", "VERIFIED"] }, orderStatus: { not: "CANCELLED" }, payment: { is: { status: { in: ["PAID", "VERIFIED"] } } } }, select: { profitSnapshot: true } })),
     dashboardQuery("latest-requests", () => prisma.jastipRequest.findMany({ take: 5, orderBy: { createdAt: "desc" }, include: { user: true } })),
   ]);
   const omzet = Number(revenue._sum.total);
   const profit = paidOrders.reduce((total, order) => {
-    const value = Number(order.quotation?.profit);
+    const value = Number(order.profitSnapshot);
     return Number.isFinite(value) ? total + value : total;
   }, 0);
   const cards = [["Total Produk", String(products), Package], ["Request Baru", String(newRequests), ReceiptText], ["Penawaran Diterima", String(acceptedQuotations), ReceiptText], ["Pembayaran Pending", String(pendingPayments), Wallet], ["Pesanan Aktif", String(activeOrders), ShoppingCart], ["Omzet", rupiah(omzet), Wallet], ["Profit", rupiah(profit), Wallet]] as const;

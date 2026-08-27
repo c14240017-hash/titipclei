@@ -92,8 +92,8 @@ export const orderStatusMap: Record<string, {
   PURCHASING: {
     label: "Barang Sedang Dipesan",
     headline: "Barang Sedang Dipesan",
-    description: "Pesananmu sedang diproses untuk pembelian.",
-    color: { bg: "bg-blue-100", text: "text-blue-800" },
+    description: "Pembayaranmu sudah berhasil diverifikasi. Pesanan sedang kami proses untuk pembelian.",
+    color: { bg: "bg-[#FBECEF]", text: "text-[#7A3340]" },
     icon: ShoppingBag,
     stepIndex: 3,
   },
@@ -101,7 +101,7 @@ export const orderStatusMap: Record<string, {
     label: "Barang Sudah Dibeli",
     headline: "Barang Sudah Dibeli",
     description: "Barangmu sudah berhasil dibeli dan menunggu proses berikutnya.",
-    color: { bg: "bg-blue-100", text: "text-blue-800" },
+    color: { bg: "bg-[#F7E8D9]", text: "text-[#704433]" },
     icon: ShoppingBag,
     stepIndex: 4,
   },
@@ -109,7 +109,7 @@ export const orderStatusMap: Record<string, {
     label: "Menunggu Pengiriman",
     headline: "Menunggu Pengiriman",
     description: "Barang sedang menunggu proses pengiriman.",
-    color: { bg: "bg-violet-100", text: "text-violet-800" },
+    color: { bg: "bg-[#F7E8D9]", text: "text-[#704433]" },
     icon: PackageCheck,
     stepIndex: 5,
   },
@@ -117,7 +117,7 @@ export const orderStatusMap: Record<string, {
     label: "Dalam Pengiriman ke Indonesia",
     headline: "Dalam Pengiriman ke Indonesia",
     description: "Barangmu sedang dalam perjalanan menuju Indonesia.",
-    color: { bg: "bg-indigo-100", text: "text-indigo-800" },
+    color: { bg: "bg-[#F7E8D9]", text: "text-[#704433]" },
     icon: Truck,
     stepIndex: 6,
   },
@@ -125,7 +125,7 @@ export const orderStatusMap: Record<string, {
     label: "Barang Tiba di Indonesia",
     headline: "Barang Sudah Tiba di Indonesia",
     description: "Barang sudah sampai di Indonesia dan sedang disiapkan untuk pengiriman lokal.",
-    color: { bg: "bg-indigo-100", text: "text-indigo-800" },
+    color: { bg: "bg-[#F7E8D9]", text: "text-[#704433]" },
     icon: PackageCheck,
     stepIndex: 6,
   },
@@ -133,7 +133,7 @@ export const orderStatusMap: Record<string, {
     label: "Dalam Pengiriman ke Alamat",
     headline: "Dalam Pengiriman ke Alamat",
     description: "Barang sedang dikirim ke alamat tujuan.",
-    color: { bg: "bg-indigo-100", text: "text-indigo-800" },
+    color: { bg: "bg-[#F7E8D9]", text: "text-[#704433]" },
     icon: Home,
     stepIndex: 7,
   },
@@ -176,17 +176,7 @@ export const paymentStatusMap: Record<string, { label: string; color: { bg: stri
   REFUNDED: { label: "Dikembalikan", color: { bg: "bg-gray-100", text: "text-gray-800" } },
 };
 
-export const progressSteps = [
-  "Penawaran Diterima",
-  "Bukti Pembayaran Dikirim",
-  "Verifikasi Pembayaran",
-  "Barang Sedang Dipesan",
-  "Barang Sudah Dibeli",
-  "Menunggu Pengiriman",
-  "Ke Indonesia",
-  "Ke Alamat",
-  "Selesai"
-];
+export const progressSteps = ["Penawaran", "Pembayaran", "Verifikasi", "Dipesan", "Dibeli", "Menunggu Kirim", "Ke Indonesia", "Ke Alamat", "Selesai"];
 
 export function getOrderStatus(status: string) {
   return orderStatusMap[status] || {

@@ -294,6 +294,15 @@ model Order {
   selectedModel         String?
   selectedImageSnapshot String?
   unitPriceSnapshot     Decimal?       @db.Decimal(18, 0)
+  totalCostSnapshot     Decimal?       @db.Decimal(18, 0)
+  profitSnapshot        Decimal?       @db.Decimal(18, 0)
+  recipientName         String?
+  recipientPhone        String?
+  addressLine           String?        @db.Text
+  city                  String?
+  province              String?
+  postalCode            String?
+  shippingNote          String?        @db.Text
   
   unitPrice        Decimal?       @db.Decimal(18, 0)
   quantity         Int            @default(1)

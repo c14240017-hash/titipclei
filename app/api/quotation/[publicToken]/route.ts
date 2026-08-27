@@ -32,6 +32,7 @@ export async function POST(request: NextRequest, context: { params: Promise<{ pu
         userId: quotation.userId, productNameSnapshot: requestData?.productName ?? "Pesanan jastip",
         variantNameSnapshot: requestData?.variant, variant: requestData?.variant,
         selectedImageSnapshot: requestData?.imageUrl, unitPriceSnapshot: quotation.finalPrice,
+        totalCostSnapshot: quotation.totalCost, profitSnapshot: quotation.profit,
         unitPrice: quotation.finalPrice, quantity: quotation.quantity,
         customerName: customer?.name, customerPhone: customer?.phone, customerEmail: customer?.email,
         subtotal: quotation.finalPrice, total: quotation.finalPrice,

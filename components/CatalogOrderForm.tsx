@@ -48,6 +48,13 @@ export function CatalogOrderForm({
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
+  const [recipientName, setRecipientName] = useState("");
+  const [recipientPhone, setRecipientPhone] = useState("");
+  const [addressLine, setAddressLine] = useState("");
+  const [city, setCity] = useState("");
+  const [province, setProvince] = useState("");
+  const [postalCode, setPostalCode] = useState("");
+  const [shippingNote, setShippingNote] = useState("");
   const [termsAccepted, setTermsAccepted] = useState(false);
   const [termsOpen, setTermsOpen] = useState(false);
   const [proof, setProof] = useState<{
@@ -143,6 +150,13 @@ export function CatalogOrderForm({
           customerName: name,
           customerPhone: phone,
           customerEmail: email,
+          recipientName: recipientName || name,
+          recipientPhone: recipientPhone || phone,
+          addressLine,
+          city,
+          province,
+          postalCode,
+          shippingNote,
           proofStorageKey: proof.key,
           termsAccepted: true,
         }),
@@ -185,7 +199,10 @@ export function CatalogOrderForm({
                   <input
                     required
                     value={name}
-                    onChange={(event) => setName(event.target.value)}
+                    onChange={(event) => {
+                      setName(event.target.value);
+                      if (!recipientName) setRecipientName(event.target.value);
+                    }}
                     className="field mt-2"
                     placeholder="Nama lengkap"
                   />
@@ -195,7 +212,10 @@ export function CatalogOrderForm({
                   <input
                     required
                     value={phone}
-                    onChange={(event) => setPhone(event.target.value)}
+                    onChange={(event) => {
+                      setPhone(event.target.value);
+                      if (!recipientPhone) setRecipientPhone(event.target.value);
+                    }}
                     className="field mt-2"
                     inputMode="tel"
                     placeholder="08xxxxxxxxxx"
@@ -212,6 +232,19 @@ export function CatalogOrderForm({
                     placeholder="email@example.com"
                   />
                 </label>
+              </div>
+            </section>
+            <section className="rounded-2xl border border-[#E8D8D1] bg-[#FFFDFC] p-6 shadow-sm">
+              <h2 className="text-lg font-bold text-[#4B342F]">Alamat Pengiriman</h2>
+              <p className="mt-1 text-sm text-[#8B716A]">Gunakan alamat lengkap agar pesanan dapat dikirim dengan tepat.</p>
+              <div className="mt-5 grid gap-4 sm:grid-cols-2">
+                <label className="text-sm font-semibold text-[#5E4039]">Nama Penerima<input required value={recipientName} onChange={(event) => setRecipientName(event.target.value)} onFocus={() => !recipientName && setRecipientName(name)} className="field mt-2" placeholder="Sama dengan nama pemesan" /></label>
+                <label className="text-sm font-semibold text-[#5E4039]">WhatsApp Penerima<input required value={recipientPhone} onChange={(event) => setRecipientPhone(event.target.value)} onFocus={() => !recipientPhone && setRecipientPhone(phone)} className="field mt-2" inputMode="tel" placeholder="Sama dengan WhatsApp pemesan" /></label>
+                <label className="text-sm font-semibold text-[#5E4039] sm:col-span-2">Alamat Lengkap<textarea required value={addressLine} onChange={(event) => setAddressLine(event.target.value)} className="field mt-2 min-h-24" placeholder="Nama jalan, nomor rumah, RT/RW, kecamatan, dll." /></label>
+                <label className="text-sm font-semibold text-[#5E4039]">Kota / Kabupaten<input required value={city} onChange={(event) => setCity(event.target.value)} className="field mt-2" /></label>
+                <label className="text-sm font-semibold text-[#5E4039]">Provinsi<input required value={province} onChange={(event) => setProvince(event.target.value)} className="field mt-2" /></label>
+                <label className="text-sm font-semibold text-[#5E4039]">Kode Pos<input required value={postalCode} onChange={(event) => setPostalCode(event.target.value)} className="field mt-2" inputMode="numeric" /></label>
+                <label className="text-sm font-semibold text-[#5E4039]">Catatan Pengiriman <span className="font-normal text-[#8B716A]">(opsional)</span><input value={shippingNote} onChange={(event) => setShippingNote(event.target.value)} className="field mt-2" placeholder="Rumah pagar putih, titip satpam." /></label>
               </div>
             </section>
             <section className="rounded-2xl border border-[#E6E8F0] bg-white p-6 shadow-sm">

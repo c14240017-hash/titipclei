@@ -13,6 +13,13 @@ const schema = z.object({
   customerName: z.string().trim().min(1), 
   customerPhone: z.string().trim().min(1), 
   customerEmail: z.string().trim().email().or(z.literal("")), 
+  recipientName: z.string().trim().min(1).max(120),
+  recipientPhone: z.string().trim().min(1).max(32),
+  addressLine: z.string().trim().min(10).max(500),
+  city: z.string().trim().min(2).max(120),
+  province: z.string().trim().min(2).max(120),
+  postalCode: z.string().trim().min(3).max(16),
+  shippingNote: z.string().trim().max(500).optional(),
   proofStorageKey: z.string().startsWith("orders/temp/"), 
   termsAccepted: z.literal(true) 
 });
@@ -21,7 +28,9 @@ export async function POST(request: Request) {
   try {
     const input = schema.parse(await request.json());
     const phone = normalizeIndonesianPhone(input.customerPhone);
+    const recipientPhone = normalizeIndonesianPhone(input.recipientPhone);
     if (!phone) return NextResponse.json({ error: "Nomor WhatsApp tidak valid." }, { status: 400 });
+    if (!recipientPhone) return NextResponse.json({ error: "Nomor WhatsApp penerima tidak valid." }, { status: 400 });
     
     const proofPath = input.proofStorageKey.split("/");
     const proofFileName = proofPath.at(-1);
@@ -82,7 +91,16 @@ export async function POST(request: Request) {
           quantity: input.quantity, 
           customerName: input.customerName, 
           customerPhone: phone, 
-          customerEmail: input.customerEmail || null, 
+          customerEmail: input.customerEmail || null,
+          recipientName: input.recipientName,
+          recipientPhone,
+          addressLine: input.addressLine,
+          city: input.city,
+          province: input.province,
+          postalCode: input.postalCode,
+          shippingNote: input.shippingNote || null,
+          totalCostSnapshot: Number(product.totalCost) * input.quantity,
+          profitSnapshot: Number(product.profit) * input.quantity,
           termsAcceptedAt: createdAt, 
           subtotal: total, 
           total, 
