@@ -27,7 +27,7 @@ export default async function AdminProductsPage({ searchParams }: { searchParams
     }),
   ]);
 
-  return <div className="mx-auto max-w-7xl"><div className="flex items-end justify-between"><div><h1 className="text-3xl font-bold">Manajemen Produk</h1><p className="mt-2 text-slate-500">Katalog produk yang tersimpan di database.</p></div><Link href="/admin/products/new" className="rounded-xl bg-indigo-600 px-4 py-2.5 text-sm font-semibold text-white">Tambah Produk</Link></div><AdminProductsTable products={products.map((product) => {
+  return <div className="mx-auto max-w-7xl"><div className="flex items-end justify-between"><div><h1 className="text-3xl font-bold">Manajemen Produk</h1><p className="mt-2 text-slate-500">Katalog produk yang tersimpan di database.</p></div><Link href="/admin/products/new" className="rounded-xl bg-[#D98392] px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-[#C86D7D] active:bg-[#B95F70] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#EAB5C0] focus-visible:ring-offset-2">Tambah Produk</Link></div><AdminProductsTable products={products.map((product) => {
     const originalPrice = toNumber(product.originalPrice);
     const exchangeRate = toNumber(product.exchangeRate);
     const totalCost = toNumber(product.totalCost);

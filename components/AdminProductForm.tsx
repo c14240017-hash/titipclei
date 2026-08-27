@@ -670,7 +670,7 @@ export function AdminProductForm({
         </div>
         <button
           disabled={saving || uploading}
-          className="mt-6 w-full rounded-xl bg-indigo-600 px-5 py-3 font-semibold text-white disabled:opacity-60"
+          className="mt-6 w-full rounded-xl bg-[#D98392] px-5 py-3 font-semibold text-white shadow-sm transition-colors hover:bg-[#C86D7D] active:bg-[#B95F70] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#EAB5C0] focus-visible:ring-offset-2 disabled:opacity-60"
         >
           {uploading
             ? "Mengupload gambar..."
